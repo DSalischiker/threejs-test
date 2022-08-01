@@ -2,10 +2,13 @@ import './style.css'
 import * as dat from 'lil-gui'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js' // for 3D models (.gltf | .glb)
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js' // for 3D models that have been compressed using Draco encoder
 
+// GLSL Shaders
+// Vertex shader is a file with position/geometry information
 import firefliesVertexShader from './shaders/fireflies/vertex.glsl';
+// Fragment shader is a file with color information
 import firefliesFragmentShader from './shaders/fireflies/fragment.glsl';
 
 import portalVertexShader from './shaders/portal/vertex.glsl';
@@ -16,6 +19,7 @@ import { DoubleSide } from 'three'
  * Base
  */
 // Debug
+// This object will be used to set parameters using the UI component
 const debugObject = {
 
 };
@@ -47,8 +51,9 @@ gltfLoader.setDRACOLoader(dracoLoader)
  * Textures
  */
 const bakedTexture = textureLoader.load('baked.jpg')
-bakedTexture.flipY = false
-bakedTexture.encoding = THREE.sRGBEncoding
+bakedTexture.flipY = false // the Y axis is inverted don't know why (three may interpret it another way than blender)
+bakedTexture.encoding = THREE.sRGBEncoding // Color encoding is an insteresting subject
+// Great article -> https://www.donmccurdy.com/2020/06/17/color-management-in-threejs/
 
 /**
  * Materials
@@ -93,6 +98,7 @@ gltfLoader.load(
     'portalMerged.glb',
     (gltf) =>
     {
+        console.log(gltf); // Look at this log to understand the structure of a gltf object
         scene.add(gltf.scene)
 
         // Get each object
@@ -110,6 +116,7 @@ gltfLoader.load(
 )
 
 /* Fireflies */
+// Particles + shaders = Overcomplicated stuff for this stage. Look if interested but not necessary at this point
 // Geometry
 const firefliesGeometry = new THREE.BufferGeometry();
 const firefliesCount = 30;
@@ -223,6 +230,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
 
     // Update materials
+    // Uniforms are variables sent to the shaders that will change over time
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
 
